@@ -3,39 +3,44 @@
 #include "omp.h"
 #include "string.h"
 
+#define N 50000
+
+// /home/jonas/Documentos/arq.txt
+
 void sequencial(char * substring, char * texto, int subSize);
 void paralelo(char * substring, char * texto, int subSize);
-void getText(FILE * file, char * texto);
 
 int main() {
     
-    char path[60] = "/home/jonas/Documents/arq2.txt", substring[15];
+    char path[60], substring[15];
     int fileSize;
 
-    //printf("Insira o caminho do arquivo: ");
-    //scanf("%s", path);
+    printf("Insira o caminho do arquivo: ");
+    scanf("%s", path);
 
     printf("Qual palavra deseja procurar? ");
     scanf("%s", substring);
-    printf(" \n ============= RESULTADOS =============\n");
+    printf(" \n ============= RESULTADOS =============\n\n");
 
     int subSize = strlen(substring);
 
-    
     FILE *file = fopen(path, "r");
 
     fseek(file, 0, SEEK_END);
-    fileSize = ftell(file);
+
+    fileSize = ftell(file); // pegar o tamanho do arquivo pra alocar a variável
+
     fseek(file, 0, SEEK_SET);
 
-    char * texto = malloc(sizeof(char)*fileSize);
+    char * texto = (char*)malloc(sizeof(char)*fileSize);
 
+	
     if(file != NULL) {
-        getText(file, texto);
 
+        fread(texto, fileSize, 1, file); // ler o arquivo e guardar na variavel do primeiro parametro
         sequencial(substring, texto, subSize);
-
         paralelo(substring, texto, subSize);
+
     } else {
         printf("Erro ao abrir o arquivo.\n");
     }
@@ -75,8 +80,8 @@ void paralelo(char * substring, char * texto, int subSize) {
         int id = omp_get_thread_num();
         int N_THREAD = omp_get_num_threads();  
   
-
-        for(j = id * N_THREAD; j < strlen(texto) && !stop; j += N_THREAD) {
+	//for(j = id * N_THREAD; j < strlen(texto) && !stop; j += N_THREAD) {
+        for(j = id * subSize; j < strlen(texto) && !stop; j += N_THREAD) {
 
             if(texto[j] == substring[0]){
                 i++;
@@ -86,27 +91,16 @@ void paralelo(char * substring, char * texto, int subSize) {
                     if(texto[k] == substring[i]) i++;
                     else i = 0;
                 }
-
+   	        
+	        
                 if(i == subSize && !stop) {
-                    printf("Encontrado pela thread = %d!! (Paralelo)\n", id);
+                    printf("Palavra Encontrada pela thread = %d!! (Paralelo)", id);
+		    //#pragma omp critical
                     stop = 1;
                 }
             }
         }
-
     }
 
-    printf("\nTempo Paralelo: %f\n", omp_get_wtime() - inicio);
-    
-}
-
-void getText(FILE * file, char * texto) {
-
-    char aux[1000];
-
-    while(!feof(file)) {
-        strcat(texto, fgets(aux, N, file));
-    }
-
-    fclose(file);
+    printf("\nTempo Paralelo: %f\n", omp_get_wtime() - inicio);  
 }
