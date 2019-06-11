@@ -81,7 +81,7 @@ void paralelo(char * substring, char * texto, int subSize) {
         int N_THREAD = omp_get_num_threads();  
   
 	//for(j = id * N_THREAD; j < strlen(texto) && !stop; j += N_THREAD) {
-        for(j = id * subSize; j < strlen(texto) && !stop; j += N_THREAD) {
+        for(j = id * subSize; j < strlen(texto) && !stop; j += subSize) {
 
             if(texto[j] == substring[0]){
                 i++;
@@ -100,7 +100,66 @@ void paralelo(char * substring, char * texto, int subSize) {
                 }
             }
         }
+
     }
 
-    printf("\nTempo Paralelo: %f\n", omp_get_wtime() - inicio);  
+    printf("\nTempo Paralelo: %f\n", omp_get_wtime() - inicio);
+    
 }
+
+
+/*
+        // #pragma omp paralell for
+        // {
+        //     int i = 0, j = 0, k = 0;
+        //     int id = omp_get_thread_num();
+        //     int N_THREAD = omp_get_num_threads();
+
+        //     printf("%d - %d", id, N_THREAD);
+
+        //     for(j = 0; j < strlen(texto); j++) {
+
+                
+        //         if(stop) {
+        //             j = strlen(texto) - 1;   
+        //         } 
+        //         else {
+        //             if(texto[j] == substring[i]) i++;
+        //             else i = 0;
+                
+                
+        //             if(i == subSize) {
+        //                 printf("Encontrado pela thread = %d!! (Paralelo)\n", id);
+        //                 stop = 1;
+        //             }
+        //         } 
+        //     }
+        // }
+            
+        
+
+        // while(!stop && j < strlen(texto)) {
+        //     if(texto[j] == substring[i]) i++;
+        //     else i = 0;
+
+        //     if(i == subSize) {
+        //         stop = 1;
+        //         printf("\nPalavra Encontrada (Paralelo)!\n");
+        //     }
+
+        //     j++;
+        // }  
+    }
+
+    // #pragma omp parallel sections
+    // {
+    //     #pragma omp section
+    //     {
+    //         printf("A");
+    //     }
+
+    //     #pragma omp section
+    //     {
+    //         printf("B");
+    //     }
+    // }*/
