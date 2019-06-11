@@ -3,7 +3,7 @@
 #include "omp.h"
 #include "string.h"
 
-#define N 50000
+//#define N 50000
 
 // /home/jonas/Documentos/arq.txt
 
